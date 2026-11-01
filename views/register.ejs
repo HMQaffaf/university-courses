@@ -1,0 +1,118 @@
+<%- include('partials/header') %>
+
+<div class="row justify-content-center align-items-center my-3">
+  <div class="col-md-7 col-lg-5">
+    <div class="auth-card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <div class="icon-box icon-box-emerald mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.75rem;">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <h3 class="fw-extrabold mb-1">Create Student Account</h3>
+        <p class="text-secondary small mb-0">Join the UOP Academic Portal to register for courses</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small rounded-3" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div><%= error %></div>
+        </div>
+      <% } %>
+
+      <!-- One-Click Google Registration -->
+      <div class="d-grid mb-3">
+        <button type="button" id="googleSignUpBtn" class="btn-google">
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span>Sign Up with Google</span>
+        </button>
+      </div>
+
+      <div class="d-flex align-items-center my-4">
+        <hr class="flex-grow-1 text-secondary opacity-25">
+        <span class="mx-3 text-secondary small fw-semibold">OR REGISTER WITH EMAIL</span>
+        <hr class="flex-grow-1 text-secondary opacity-25">
+      </div>
+
+      <form method="post" action="/register">
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-secondary">Full Name / Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="bi bi-person text-secondary"></i></span>
+            <input type="text" name="username" class="form-control border-start-0" placeholder="e.g. Hashem Qaffaf" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-secondary">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="bi bi-envelope text-secondary"></i></span>
+            <input type="email" name="email" class="form-control border-start-0" placeholder="student@uop.edu.jo" required>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-secondary">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="bi bi-lock text-secondary"></i></span>
+            <input type="password" name="password" class="form-control border-start-0" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-uop-primary py-2">
+            <i class="bi bi-check2-circle me-1"></i> Create Account
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-4 pt-2 border-top">
+        <p class="small text-secondary mb-0">
+          Already have an account? <a href="/login" class="text-primary fw-bold text-decoration-none">Sign In Here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSy_YOUR_FIREBASE_API_KEY_HERE",
+    authDomain: "your-firebase-project-id.firebaseapp.com",
+    projectId: "your-firebase-project-id",
+    storageBucket: "your-firebase-project-id.firebasestorage.app",
+    messagingSenderId: "000000000000",
+    appId: "1:000000000000:web:7b32c34872599696ee3b97"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  document.getElementById('googleSignUpBtn').addEventListener('click', async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      const response = await fetch('/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken })
+      });
+      const data = await response.json();
+      if (data.success) {
+        window.location.href = '/profile';
+      }
+    } catch (error) {
+      alert("Google Sign-Up Error: " + error.message);
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+
+<!-- Header Banner -->
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4 pb-3 border-bottom">
+  <div>
+    <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold mb-2">Academic Catalog • 2026</span>
+    <h2 class="fw-extrabold mb-1">Available University Courses</h2>
+    <p class="text-secondary mb-0">Select a course below to inspect available lecture sections, instructors, and schedules.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <% if (userLoggedIn) { %>
+      <a href="/add-course" class="btn btn-outline-primary rounded-3 fw-semibold">
+        <i class="bi bi-plus-lg me-1"></i> Add Course Section
+      </a>
+      <a href="/my-courses" class="btn btn-uop-primary">
+        <i class="bi bi-calendar2-check me-1"></i> My Enrolled Schedule
+      </a>
+    <% } else { %>
+      <a href="/login" class="btn btn-uop-primary">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Enroll
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<!-- Search & Metrics Bar -->
+<div class="row g-3 align-items-center mb-4">
+  <div class="col-md-6">
+    <div class="input-group shadow-sm rounded-3">
+      <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-secondary"></i></span>
+      <input type="text" id="courseSearchInput" class="form-control border-start-0" placeholder="Search courses by name...">
+    </div>
+  </div>
+  <div class="col-md-6 text-md-end">
+    <span class="badge bg-white text-dark border p-2 px-3 rounded-3 me-2 shadow-sm">
+      <i class="bi bi-book text-primary me-1"></i>
+      <strong><%= typeof totalCoursesCount !== 'undefined' ? totalCoursesCount : Object.keys(groupedCourses || {}).length %></strong> Subjects
+    </span>
+    <span class="badge bg-white text-dark border p-2 px-3 rounded-3 shadow-sm">
+      <i class="bi bi-collection text-success me-1"></i>
+      <strong><%= typeof totalSectionsCount !== 'undefined' ? totalSectionsCount : 0 %></strong> Open Sections
+    </span>
+  </div>
+</div>
+
+<!-- Course Grid -->
+<div class="row g-4" id="coursesGrid">
+  <% if (typeof groupedCourses !== 'undefined' && Object.keys(groupedCourses).length > 0) { %>
+    <% Object.keys(groupedCourses).forEach((courseName, idx) => { 
+         const sections = groupedCourses[courseName];
+         const icons = ['bi-cpu', 'bi-code-square', 'bi-robot', 'bi-database', 'bi-shield-check', 'bi-diagram-3'];
+         const iconClass = icons[idx % icons.length];
+    %>
+      <div class="col-md-6 col-lg-4 course-card-item" data-name="<%= courseName.toLowerCase() %>">
+        <div class="uop-card uop-card-hover p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="icon-box">
+                <i class="bi <%= iconClass %>"></i>
+              </div>
+              <span class="badge bg-light text-secondary border">3 Credit Hours</span>
+            </div>
+            <h5 class="fw-bold mb-2"><%= courseName %></h5>
+            <p class="small text-secondary mb-3">
+              <i class="bi bi-people me-1"></i>
+              <%= sections.length %> <%= sections.length === 1 ? 'Section' : 'Sections' %> Available
+            </p>
+            <div class="small text-muted mb-4">
+              <strong>Instructors:</strong>
+              <%= [...new Set(sections.map(s => s.teacher))].join(', ') %>
+            </div>
+          </div>
+
+          <a href="/course-details/<%= encodeURIComponent(courseName) %>" class="btn btn-uop-primary w-100 d-flex align-items-center justify-content-center gap-2">
+            <span>View Sections & Enroll</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="col-12">
+      <div class="uop-card p-5 text-center">
+        <i class="bi bi-journal-x display-4 text-secondary mb-3 d-block"></i>
+        <h5 class="fw-bold">No Courses Available Yet</h5>
+        <p class="text-secondary small mb-3">Add a new course section to populate the university catalog.</p>
+        <a href="/add-course" class="btn btn-uop-primary">Add First Course</a>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  const searchInput = document.getElementById('courseSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.course-card-item').forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        card.style.display = name.includes(term) ? '' : 'none';
+      });
+    });
+  }
+</script>
+
+<%- include('partials/footer') %>

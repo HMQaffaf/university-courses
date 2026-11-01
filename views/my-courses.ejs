@@ -1,0 +1,100 @@
+<%- include('partials/header') %>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4 pb-3 border-bottom">
+  <div>
+    <span class="badge bg-success bg-opacity-10 text-success fw-semibold mb-2">Student Timetable</span>
+    <h2 class="fw-extrabold mb-1">My Registered Courses</h2>
+    <p class="text-secondary mb-0">Manage your enrolled sections and weekly lecture timings.</p>
+  </div>
+  <a href="/courses" class="btn btn-uop-primary">
+    <i class="bi bi-plus-circle me-1"></i> Browse & Add More Courses
+  </a>
+</div>
+
+<!-- Summary Strip -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="uop-card p-3 d-flex align-items-center gap-3">
+      <div class="icon-box">
+        <i class="bi bi-journal-check"></i>
+      </div>
+      <div>
+        <div class="small text-secondary">Enrolled Courses</div>
+        <h4 class="fw-extrabold mb-0"><%= courses.length %></h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="uop-card p-3 d-flex align-items-center gap-3">
+      <div class="icon-box icon-box-emerald">
+        <i class="bi bi-award"></i>
+      </div>
+      <div>
+        <div class="small text-secondary">Registered Credit Hours</div>
+        <h4 class="fw-extrabold mb-0"><%= courses.length * 3 %> Cr. Hrs</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="uop-card p-3 d-flex align-items-center gap-3">
+      <div class="icon-box icon-box-amber">
+        <i class="bi bi-PatchCheck"></i>
+        <i class="bi bi-calendar2-Check"></i>
+      </div>
+      <div>
+        <div class="small text-secondary">Semester Status</div>
+        <h5 class="fw-bold text-success mb-0">Active Registration</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (courses.length === 0) { %>
+  <div class="uop-card p-5 text-center my-4">
+    <div class="icon-box mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+      <i class="bi bi-calendar-x"></i>
+    </div>
+    <h4 class="fw-bold">No Courses Registered Yet</h4>
+    <p class="text-secondary mx-auto mb-4" style="max-width: 460px;">
+      You haven't added any course sections to your schedule yet. Explore the course catalog to register for your classes.
+    </p>
+    <a href="/courses" class="btn btn-uop-primary px-4">Explore Course Catalog</a>
+  </div>
+<% } else { %>
+  <div class="row g-4">
+    <% courses.forEach(c => { %>
+      <div class="col-md-6 col-lg-4">
+        <div class="uop-card uop-card-hover p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                <i class="bi bi-check-circle me-1"></i> Enrolled
+              </span>
+              <span class="small text-secondary fw-semibold">3 Cr. Hrs</span>
+            </div>
+            <h5 class="fw-bold mb-3"><%= c.name %></h5>
+
+            <div class="p-3 bg-light rounded-3 mb-3">
+              <div class="d-flex align-items-center gap-2 mb-2 small">
+                <i class="bi bi-person-workspace text-primary"></i>
+                <span class="text-secondary">Instructor:</span>
+                <strong class="text-dark"><%= c.teacher %></strong>
+              </div>
+              <div class="d-flex align-items-center gap-2 small">
+                <i class="bi bi-clock text-primary"></i>
+                <span class="text-secondary">Time:</span>
+                <strong class="text-dark"><%= c.startTime %> — <%= c.endTime %></strong>
+              </div>
+            </div>
+          </div>
+
+          <a href="/remove/<%= c._id %>" class="btn btn-outline-danger w-100 rounded-3 fw-semibold">
+            <i class="bi bi-trash3 me-1"></i> Drop Course
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>
