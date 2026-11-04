@@ -17,13 +17,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Persistent session cookie: Keeps student logged in for 30 days even if browser is closed!
 app.use(expressSession({
-    secret: process.env.SESSION_SECRET || 'development_session_secret_placeholder',
+    secret: process.env.SESSION_SECRET || 'UOP_Portal_Secret_Key_2026',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 30, // 30 Days
+        httpOnly: true
+    }
 }));
 
-// Make auth state & current path available to all EJS views
+// Make auth state & query parameters available to all EJS templates
 app.use((req, res, next) => {
     res.locals.userLoggedIn = req.session.userLoggedIn || false;
     res.locals.currentUsername = req.session.username || null;
@@ -47,7 +53,7 @@ async function seedInitialCourses() {
                 { name: "Data Structures & Algorithms", teacher: "Dr. Lina Haddad", startTime: "11:00 AM", endTime: "12:30 PM" },
                 { name: "Full-Stack Web Technologies", teacher: "Dr. Tariq Nassar", startTime: "10:00 AM", endTime: "11:30 AM" },
                 { name: "Full-Stack Web Technologies", teacher: "Eng. Sara Qudah", startTime: "01:00 PM", endTime: "02:30 PM" },
-                { name: "Artificial Intelligence & Machine Learning", teacher: "Prof. Rami Zوايدة", startTime: "09:30 AM", endTime: "11:00 AM" },
+                { name: "Artificial Intelligence & Machine Learning", teacher: "Prof. Rami Zwaideh", startTime: "09:30 AM", endTime: "11:00 AM" },
                 { name: "Database Management Systems", teacher: "Dr. Omar Dabbas", startTime: "12:00 PM", endTime: "01:30 PM" },
                 { name: "Cybersecurity & Network Defense", teacher: "Dr. Nadine Khoury", startTime: "02:00 PM", endTime: "03:30 PM" },
                 { name: "Software Engineering Principles", teacher: "Dr. Zaid Al-Fayez", startTime: "11:00 AM", endTime: "12:30 PM" }
